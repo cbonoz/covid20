@@ -31,7 +31,7 @@ import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.contentbrowser.helper.FontManager;
 import com.amazon.android.contentbrowser.helper.LauncherIntegrationManager;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
-import com.amazon.android.contentbrowser.payments.PaymentDialog;
+import com.amazon.android.contentbrowser.payments.PaymentHelper;
 import com.amazon.android.contentbrowser.recommendations.RecommendationManager;
 import com.amazon.android.interfaces.ICancellableLoad;
 import com.amazon.android.interfaces.IContentBrowser;
@@ -1970,7 +1970,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 break;
             case CONTENT_ACTION_BUY:
                 try {
-                    PaymentDialog.createPaymentDialog(activity, content,
+                    PaymentHelper.createPaymentDialog(activity, content,
                             (dialog, input) -> {
                                 dialog.dismiss();
                             });

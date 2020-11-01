@@ -1,18 +1,33 @@
 package com.amazon.android.contentbrowser.payments;
 
-import java.security.cert.CertificateException;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import javax.net.ssl.HostnameVerifier;
+import com.amazon.android.contentbrowser.R;
+import com.amazon.android.model.content.Content;
+import com.google.gson.Gson;
+import com.squareup.picasso.OkHttp3Downloader;
+import com.squareup.picasso.Picasso;
+
+import org.apache.commons.codec.binary.StringUtils;
+
+import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 
 public class PaymentHelper {
 
@@ -21,7 +36,7 @@ public class PaymentHelper {
     private static OkHttpClient getUnsafeOkHttpClient() {
         try {
             // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[] {
+            final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         @Override
                         public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
@@ -45,13 +60,73 @@ public class PaymentHelper {
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
             builder.hostnameVerifier((hostname, session) -> true);
 
             return builder.build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public static final Map<String, Integer> PRICE_MAP = new HashMap<>();
+    public static Gson GSON = new Gson();
+
+    public static final String TEST_ADDR = "n4VQ5YdHf7hLQ2gWQYYrcxoE5B7nWuDFNF";
+
+
+    public static void createPaymentDialog(Activity context,
+                                           Content content,
+                                           DialogInterface.OnClickListener onClickListener)
+            throws Exception {
+        final double price;
+        if (PRICE_MAP.containsKey(content.getId())) {
+            String string = context.getString(PRICE_MAP.get(content.getId()));
+            price = Double.parseDouble(string.substring(1)); // remove $.
+        } else {
+            // TODO: pull from product backend.
+            price = 100.0;
+//            throw new Exception("Could not find price for item: " + content.getId() + ". This needs to be added to the PRICE_MAP.");
+        }
+
+        ViewGroup subView = (ViewGroup) context.getLayoutInflater().// inflater view
+                inflate(R.layout.payment_dialog, null, false);
+
+        TextView purchaseTextView = (TextView) subView.findViewById(R.id.pay_id_text);
+        final String purchaseText = String.format(Locale.US,
+                "Scan with your mobile wallet to send funds to %s.",
+                content.getTitle());
+        purchaseTextView.setText(purchaseText);
+
+        final String description = content.getDescription().isEmpty() ?
+                content.getTitle() :
+                content.getDescription();
+
+        TextView conversionTextView = (TextView) subView.findViewById(R.id.conversion_text);
+        final String conversionText = String.format(Locale.US,
+                "Amount: $%.2f\nDescription: %s",
+                price, description);
+        conversionTextView.setText(conversionText);
+
+        Picasso picasso = new Picasso.Builder(context).downloader(new OkHttp3Downloader(HTTP_CLIENT)).build();
+        picasso.setLoggingEnabled(true);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            String url = createBitcoinQRCode(TEST_ADDR);
+            ImageView v = (ImageView) subView.findViewById(R.id.btcImage);
+            picasso.load(url).into(v);
+
+            new AlertDialog.Builder(context)
+                    .setView(subView)
+                    .setTitle(R.string.scan_to_purchase)
+                    .setPositiveButton(R.string.done, onClickListener)
+                    .show();
+
+        });
+    }
+
+    public static String createBitcoinQRCode(String addr) {
+        return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + addr;
     }
 
 }
