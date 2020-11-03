@@ -15,8 +15,6 @@ import com.google.gson.Gson;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
-import org.apache.commons.codec.binary.StringUtils;
-
 import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -32,6 +30,7 @@ import okhttp3.OkHttpClient;
 public class PaymentHelper {
 
     public static final OkHttpClient HTTP_CLIENT = getUnsafeOkHttpClient();
+    private static final String QR_URL = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=";
 
     private static OkHttpClient getUnsafeOkHttpClient() {
         try {
@@ -69,12 +68,10 @@ public class PaymentHelper {
         }
     }
 
-
     public static final Map<String, Integer> PRICE_MAP = new HashMap<>();
     public static Gson GSON = new Gson();
 
     public static final String TEST_ADDR = "n4VQ5YdHf7hLQ2gWQYYrcxoE5B7nWuDFNF";
-
 
     public static void createPaymentDialog(Activity context,
                                            Content content,
@@ -105,28 +102,28 @@ public class PaymentHelper {
 
         TextView conversionTextView = (TextView) subView.findViewById(R.id.conversion_text);
         final String conversionText = String.format(Locale.US,
-                "Amount: $%.2f\nDescription: %s",
+                "Amount: $%.2f\nDescription: %s\n\nSend payment with Bitcoin:",
                 price, description);
         conversionTextView.setText(conversionText);
 
         Picasso picasso = new Picasso.Builder(context).downloader(new OkHttp3Downloader(HTTP_CLIENT)).build();
         picasso.setLoggingEnabled(true);
         new Handler(Looper.getMainLooper()).post(() -> {
-            String url = createBitcoinQRCode(TEST_ADDR);
+            String url = createBitcoinQRCodeUrl(TEST_ADDR);
             ImageView v = (ImageView) subView.findViewById(R.id.btcImage);
             picasso.load(url).into(v);
 
             new AlertDialog.Builder(context)
                     .setView(subView)
-                    .setTitle(R.string.scan_to_purchase)
+                    .setTitle(R.string.scan_to_pay)
                     .setPositiveButton(R.string.done, onClickListener)
                     .show();
 
         });
     }
 
-    public static String createBitcoinQRCode(String addr) {
-        return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + addr;
+    public static String createBitcoinQRCodeUrl(String addr) {
+        return String.format(Locale.US, "%s%s", QR_URL, addr);
     }
 
 }

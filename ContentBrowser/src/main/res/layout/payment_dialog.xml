@@ -20,36 +20,23 @@
         android:text="" />
 
 
-    <!--    <EditText-->
-    <!--        android:inputType="text"-->
-    <!--        android:hint="@string/enter_payid"-->
-    <!--        android:id="@+id/pay_id_input"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"/>-->
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="40dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="40dp">
+<!--        <TextView-->
+<!--            android:id="@+id/btcText"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Send payment with Bitcoin"-->
+<!--            android:textAlignment="center" />-->
 
-            <TextView
-                android:id="@+id/btcText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="BTC" />
-
-            <ImageView
-                android:id="@+id/btcImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
+        <ImageView
+            android:id="@+id/btcImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
+
 </LinearLayout>

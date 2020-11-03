@@ -70,4 +70,5 @@ permissions and limitations under the License.
     <string name="buy_tickets_1">$100</string>
     <string name="scan_to_purchase">Scan address to complete purchase</string>
     <string name="done">Done</string>
+    <string name="scan_to_pay">Scan address to send payment</string>
 </resources>
