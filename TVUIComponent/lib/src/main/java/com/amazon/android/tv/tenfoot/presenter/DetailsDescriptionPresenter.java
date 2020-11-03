@@ -1,12 +1,12 @@
 /**
  * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * A copy of the License is located at
- *
- *     http://aws.amazon.com/apache2.0/
- *
+ * <p>
+ * http://aws.amazon.com/apache2.0/
+ * <p>
  * or in the "license" file accompanying this file. This file is distributed
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
@@ -30,6 +30,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
@@ -87,8 +89,8 @@ public class DetailsDescriptionPresenter extends Presenter {
         mContext = parent.getContext();
 
         View view = LayoutInflater.from(parent.getContext())
-                                  .inflate(R.layout.details_description_presenter_layout, parent,
-                                           false);
+                .inflate(R.layout.details_description_presenter_layout, parent,
+                        false);
         return new ViewHolder(view);
     }
 
@@ -110,8 +112,7 @@ public class DetailsDescriptionPresenter extends Presenter {
 
         if (content != null) {
             populateViewHolder(viewHolder, content);
-        }
-        else {
+        } else {
             Log.e(TAG, "Content is null in onBindDescription");
         }
     }
@@ -128,17 +129,22 @@ public class DetailsDescriptionPresenter extends Presenter {
 
         viewHolder.getTitle().setEllipsize(TextUtils.TruncateAt.END);
         viewHolder.getTitle().setSingleLine();
-        viewHolder.getTitle().setText(content.getTitle());
+        final String title = content.getTitle() + " is raising money.";
+        viewHolder.getTitle().setText(title);
         CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), viewHolder.getTitle(),
-                                             config.getTypefacePath(ConfigurationConstants
-                                                                            .BOLD_FONT));
+                config.getTypefacePath(ConfigurationConstants
+                        .BOLD_FONT));
 
         viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
 
-        viewHolder.getBody().setText(content.getDescription().trim());
+        final String description = String.format(Locale.US,
+                "%s Click below to lend, or watch a brief video for more information.",
+                content.getDescription().trim());
+
+                viewHolder.getBody().setText(description);
         CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), viewHolder.getBody(),
-                                             config.getTypefacePath(ConfigurationConstants
-                                                                            .LIGHT_FONT));
+                config.getTypefacePath(ConfigurationConstants
+                        .LIGHT_FONT));
 
     }
 
